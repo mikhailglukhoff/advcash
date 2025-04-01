@@ -1,16 +1,20 @@
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
-from config import user_data, telegram_bot_token
+from config import Settings
 from functions import AdvCashAPIClient
 
+settings = Settings()
+
 # Инициализация бота и диспетчера
-bot = Bot(token=telegram_bot_token)
+bot = Bot(token=settings.tg_bot_token)
 dp = Dispatcher(bot)
 logging.basicConfig(level=logging.INFO)
 
 # Инициализация API-клиента AdvCash
-api_client = AdvCashAPIClient(**user_data)
+api_client = AdvCashAPIClient(api_name=settings.api_name, api_secret=settings.api_secret,
+                              account_email=settings.account_email)
+
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
@@ -23,6 +27,7 @@ async def start(message: types.Message):
         response = f"Ошибка при получении баланса: {e}"
 
     await message.reply(text=response)
+
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
